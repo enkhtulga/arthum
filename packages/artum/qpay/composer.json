@@ -1,0 +1,15 @@
+{
+    "name": "artum/qpay",
+    "autoload": {
+        "psr-4": {
+            "Artum\\Qpay\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "enkhtulga",
+            "email": "enkhtulga.1@gmail.com"
+        }
+    ],
+    "require": {}
+}

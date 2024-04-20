@@ -1,7 +1,10 @@
 {
     "name": "laravel/laravel",
     "description": "The Laravel Framework.",
-    "keywords": ["framework", "laravel"],
+    "keywords": [
+        "framework",
+        "laravel"
+    ],
     "license": "MIT",
     "type": "project",
     "require": {
@@ -44,7 +47,8 @@
         "spatie/laravel-permission": "^5.5",
         "stripe/stripe-php": "^10.5",
         "twilio/sdk": "^6.44",
-        "unicodeveloper/laravel-paystack": "^1.0"
+        "unicodeveloper/laravel-paystack": "^1.0",
+        "artum/qpay": "*"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.8",
@@ -62,9 +66,12 @@
             "database/factories"
         ],
         "psr-4": {
-            "App\\": "app/"
+            "App\\": "app/",
+            "Artum\\Qpay\\": "packages/arthum/qpay/src/"
         },
-        "files": ["app/Http/Helpers.php"]
+        "files": [
+            "app/Http/Helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -73,8 +80,7 @@
     },
     "extra": {
         "laravel": {
-            "dont-discover": [
-            ]
+            "dont-discover": []
         }
     },
     "scripts": {
@@ -98,5 +104,11 @@
         }
     },
     "minimum-stability": "dev",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/artum/qpay"
+        }
+    ],
     "prefer-stable": true
 }
