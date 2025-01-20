@@ -4,10 +4,12 @@ namespace App\Models;
 
 use App;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\PreventDemoModeChanges;
 
 class Product extends Model
 {
-
+    use PreventDemoModeChanges;
+    
     protected $guarded = ['choice_attributes'];
 
     protected $with = ['product_translations', 'taxes', 'thumbnail'];
@@ -34,9 +36,9 @@ class Product extends Model
         return $this->belongsToMany(Category::class, 'product_categories');
     }
 
-    public function frequently_brought_products()
+    public function frequently_bought_products()
     {
-        return $this->hasMany(FrequentlyBroughtProduct::class);
+        return $this->hasMany(FrequentlyBoughtProduct::class);
     }
 
     public function product_categories()
@@ -61,7 +63,7 @@ class Product extends Model
 
     public function reviews()
     {
-        return $this->hasMany(Review::class)->where('status', 1);
+        return $this->hasMany(Review::class);
     }
 
     public function product_queries()
@@ -84,9 +86,9 @@ class Product extends Model
         return $this->hasMany(ProductTax::class);
     }
 
-    public function flash_deal_product()
+    public function flash_deal_products()
     {
-        return $this->hasOne(FlashDealProduct::class);
+        return $this->hasMany(FlashDealProduct::class);
     }
 
     public function bids()
@@ -123,4 +125,20 @@ class Product extends Model
     {
         return $this->hasMany(LastViewedProduct::class);
     }
+
+    public function warranty()
+    {
+        return $this->belongsTo(Warranty::class);
+    }
+
+    public function warrantyNote()
+    {
+        return $this->belongsTo(Note::class, 'warranty_note_id');
+    }
+
+    public function refundNote()
+    {
+        return $this->belongsTo(Note::class, 'refund_note_id');
+    }
+
 }

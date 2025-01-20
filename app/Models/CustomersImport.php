@@ -6,9 +6,12 @@ use App\Models\Customer;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Illuminate\Support\Facades\Hash;
+use App\Traits\PreventDemoModeChanges;
 
 class CustomersImport implements ToModel, WithHeadingRow
 {
+    use PreventDemoModeChanges;
+
     public function model(array $row)
     {
         return new Customer([

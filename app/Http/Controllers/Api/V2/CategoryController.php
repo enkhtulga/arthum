@@ -17,9 +17,9 @@ class CategoryController extends Controller
             $parent_id = $category->id;
         }
 
-        return Cache::remember("app.categories-$parent_id", 86400, function () use ($parent_id) {
+        // return Cache::remember("app.categories-$parent_id", 86400, function () use ($parent_id) {
             return new CategoryCollection(Category::where('parent_id', $parent_id)->whereDigital(0)->get());
-        });
+        // });
     }
 
     public function info($slug)

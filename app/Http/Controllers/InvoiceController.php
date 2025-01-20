@@ -102,12 +102,16 @@ class InvoiceController extends Controller
         $config = [];
 
         $order = Order::findOrFail($id);
-        return PDF::loadView('backend.invoices.invoice', [
-            'order' => $order,
-            'font_family' => $font_family,
-            'direction' => $direction,
-            'text_align' => $text_align,
-            'not_text_align' => $not_text_align
-        ], [], $config)->download('order-' . $order->code . '.pdf');
+        if (in_array(auth()->user()->user_type, ['admin','staff']) || in_array(auth()->id(), [$order->user_id, $order->seller_id])) {
+            return PDF::loadView('backend.invoices.invoice', [
+                'order' => $order,
+                'font_family' => $font_family,
+                'direction' => $direction,
+                'text_align' => $text_align,
+                'not_text_align' => $not_text_align
+            ], [], $config)->download('order-' . $order->code . '.pdf');
+        }
+        flash(translate("You do not have the right permission to access this invoice."))->error();
+        return redirect()->route('home');
     }
 }

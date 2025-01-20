@@ -29,16 +29,21 @@ class BkashController extends Controller
     {
         $amount = 0;
         if (Session::has('payment_type')) {
-            if (Session::get('payment_type') == 'cart_payment') {
+            $paymentType = Session::get('payment_type');
+            $paymentData = Session::get('payment_data');
+            if ($paymentType == 'cart_payment') {
                 $combined_order = CombinedOrder::findOrFail(Session::get('combined_order_id'));
                 $amount = round($combined_order->grand_total);
-            } elseif (Session::get('payment_type') == 'wallet_payment') {
-                $amount = round(Session::get('payment_data')['amount']);
-            } elseif (Session::get('payment_type') == 'customer_package_payment') {
-                $customer_package = CustomerPackage::findOrFail(Session::get('payment_data')['customer_package_id']);
+            } elseif ($paymentType == 'order_re_payment') {
+                $combined_order = CombinedOrder::findOrFail($paymentData['order_id']);
+                $amount = round($combined_order->grand_total);
+            } elseif ($paymentType == 'wallet_payment') {
+                $amount = round($paymentData['amount']);
+            } elseif ($paymentType == 'customer_package_payment') {
+                $customer_package = CustomerPackage::findOrFail($paymentData['customer_package_id']);
                 $amount = round($customer_package->amount);
-            } elseif (Session::get('payment_type') == 'seller_package_payment') {
-                $seller_package = SellerPackage::findOrFail(Session::get('payment_data')['seller_package_id']);
+            } elseif ($paymentType == 'seller_package_payment') {
+                $seller_package = SellerPackage::findOrFail($paymentData['seller_package_id']);
                 $amount = round($seller_package->amount);
             }
         }
@@ -128,9 +133,9 @@ class BkashController extends Controller
             }
             return view('frontend.bkash.fail')->with(['errorMessage' => $response['statusMessage']]);
             
-        }else if (isset($allRequest['status']) && $allRequest['status'] == 'cancel'){
+        } else if (isset($allRequest['status']) && $allRequest['status'] == 'cancel'){
             return view('frontend.bkash.fail')->with(['errorMessage' => 'Payment Cancelled']);
-        }else{
+        } else{
             return view('frontend.bkash.fail')->with(['errorMessage' => 'Payment Failure']);
         }
         
@@ -230,18 +235,22 @@ class BkashController extends Controller
     public function success(Request $request)
     {
         $payment_type = Session::get('payment_type');
-
+        $paymentData = Session::get('payment_data');
+        
         if ($payment_type == 'cart_payment') {
             return (new CheckoutController)->checkout_done(Session::get('combined_order_id'), Session::get('payment_details'));
         }
-        if ($payment_type == 'wallet_payment') {
-            return (new WalletController)->wallet_payment_done(Session::get('payment_data'), Session::get('payment_details'));
+        elseif ($payment_type == 'order_re_payment') {
+            return (new CheckoutController)->orderRePaymentDone($paymentData, Session::get('payment_details'));
         }
-        if ($payment_type == 'customer_package_payment') {
-            return (new CustomerPackageController)->purchase_payment_done(Session::get('payment_data'), Session::get('payment_details'));
+        elseif ($payment_type == 'wallet_payment') {
+            return (new WalletController)->wallet_payment_done($paymentData, Session::get('payment_details'));
         }
-        if ($payment_type == 'seller_package_payment') {
-            return (new SellerPackageController)->purchase_payment_done(Session::get('payment_data'), Session::get('payment_details'));
+        elseif ($payment_type == 'customer_package_payment') {
+            return (new CustomerPackageController)->purchase_payment_done($paymentData, Session::get('payment_details'));
+        }
+        elseif ($payment_type == 'seller_package_payment') {
+            return (new SellerPackageController)->purchase_payment_done($paymentData, Session::get('payment_details'));
         }
     }
 }

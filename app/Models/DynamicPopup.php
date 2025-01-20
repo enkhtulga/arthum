@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\PreventDemoModeChanges;
 
 class DynamicPopup extends Model
 {
-    use HasFactory;
+    use HasFactory, PreventDemoModeChanges;
+
 
     protected $guarded = ['id'];
 

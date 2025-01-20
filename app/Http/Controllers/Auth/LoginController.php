@@ -10,13 +10,12 @@ use App\Models\User;
 use App\Models\Customer;
 use App\Models\Cart;
 use App\Services\SocialRevoke;
+use App\Utility\EmailUtility;
 use Session;
 use Illuminate\Http\Request;
 use CoreComponentRepository;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Str;
 use GuzzleHttp\Client;
-use Auth;
 use Storage;
 
 class LoginController extends Controller
@@ -177,6 +176,13 @@ class LoginController extends Controller
                 $newUser->save();
                 //proceed to login
                 auth()->login($newUser, true);
+
+                // customer Account Opening Email to Admin
+                if ((get_email_template_data('customer_reg_email_to_admin', 'status') == 1)) {
+                    try {
+                        EmailUtility::customer_registration_email('customer_reg_email_to_admin', $newUser, null);
+                    } catch (\Exception $e) {}
+                }
             }
         }
 
@@ -256,14 +262,18 @@ class LoginController extends Controller
     public function authenticated()
     {
         if (session('temp_user_id') != null) {
-            Cart::where('temp_user_id', session('temp_user_id'))
+            if(auth()->user()->user_type == 'customer'){
+                Cart::where('temp_user_id', session('temp_user_id'))
                 ->update(
                     [
                         'user_id' => auth()->user()->id,
                         'temp_user_id' => null
                     ]
                 );
-
+            }
+            else {
+                Cart::where('temp_user_id', session('temp_user_id'))->delete();
+            }
             Session::forget('temp_user_id');
         }
 
@@ -378,7 +388,7 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except(['logout', 'account_deletion']);
     }
-    
+
     public function handle_demo_login()
     {
         return view('frontend.handle_demo_login');

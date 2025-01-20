@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\Upload;
 use App\Models\Product;
 use App\Utility\CartUtility;
+use App\Utility\EmailUtility;
 use Cookie;
 use Illuminate\Http\Request;
 
@@ -42,9 +43,11 @@ class PurchaseHistoryController extends Controller
     public function purchase_history_details($id)
     {
         $order = Order::findOrFail(decrypt($id));
-        $order->delivery_viewed = 1;
-        $order->payment_status_viewed = 1;
-        $order->save();
+        if(env('DEMO_MODE') != 'On'){            
+            $order->delivery_viewed = 1;
+            $order->payment_status_viewed = 1;
+            $order->save();
+        }
         return view('frontend.user.order_details_customer', compact('order'));
     }
 
@@ -92,6 +95,9 @@ class PurchaseHistoryController extends Controller
                 $orderDetail->save();
                 product_restock($orderDetail);
             }
+
+            // Order paid notification to Customer, Seller, & Admin
+            EmailUtility::order_email($order, 'cancelled'); 
 
             flash(translate('Order has been canceled successfully'))->success();
         } else {

@@ -4,6 +4,7 @@ use App\Http\Controllers\CustomerPackageController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\CustomerPackagePaymentController;
 use App\Http\Controllers\ManualPaymentMethodController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SellerPackageController;
 use App\Http\Controllers\SellerPackagePaymentController;
 
@@ -22,6 +23,11 @@ use App\Http\Controllers\SellerPackagePaymentController;
 Route::group(['prefix' =>'admin', 'middleware' => ['auth', 'admin']], function(){
     Route::resource('manual_payment_methods', ManualPaymentMethodController::class);
     Route::get('/manual_payment_methods/destroy/{id}', [ManualPaymentMethodController::class, 'destroy'])->name('manual_payment_methods.destroy');
+    
+    // Offile Orders
+    Route::get('/offline-payment-orders', [OrderController::class, 'all_orders'])->name('offline_payment_orders.index');
+
+    // Wallet Recharge Request
     Route::get('/offline-wallet-recharge-requests', [WalletController::class, 'offline_recharge_request'])->name('offline_wallet_recharge_request.index');
     Route::post('/offline-wallet-recharge/approved', [WalletController::class, 'updateApproved'])->name('offline_recharge_request.approved');
 
@@ -36,7 +42,6 @@ Route::group(['prefix' =>'admin', 'middleware' => ['auth', 'admin']], function()
 });
 
 //FrontEnd
-Route::post('/purchase_history/make_payment', [ManualPaymentMethodController::class, 'show_payment_modal'])->name('checkout.make_payment');
 Route::post('/purchase_history/make_payment/submit', [ManualPaymentMethodController::class, 'submit_offline_payment'])->name('purchase_history.make_payment');
 Route::post('/offline-wallet-recharge-modal', [ManualPaymentMethodController::class, 'offline_recharge_modal'])->name('offline_wallet_recharge_modal');
 
@@ -49,6 +54,8 @@ Route::group(['middleware' => ['user', 'verified']], function(){
 Route::post('/offline-customer-package-purchase-modal', [ManualPaymentMethodController::class, 'offline_customer_package_purchase_modal'])->name('offline_customer_package_purchase_modal');
 Route::post('/offline-customer-package-paymnet', [CustomerPackageController::class, 'purchase_package_offline'])->name('customer_package.make_offline_payment');
 
+// Order Re-Payments
+Route::post('/offline-order-re-payment-modal', [ManualPaymentMethodController::class, 'offline_order_re_payment_modal'])->name('offline_order_re_payment_modal');
 
 Route::group(['prefix' => 'seller', 'middleware' => ['seller', 'verified', 'user'], 'as' => 'seller.'], function () {
     // Seller Package purchase

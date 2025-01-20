@@ -12,15 +12,11 @@ use Illuminate\Support\Str;
 
 class CustomerProductController extends Controller
 {
-    //
-
-
     public function all()
     {
         $products = CustomerProduct::where('status', '1')->where('published', '1')->paginate(10);
         return new ClassifiedProductMiniCollection($products);
     }
-
 
     public function ownProducts()
     {
@@ -28,14 +24,12 @@ class CustomerProductController extends Controller
         return new ClassifiedProductMiniCollection($products);
     }
 
-
     public function relatedProducts($slug)
     {
         $product =   CustomerProduct::where('slug', $slug)->first();
         $products =   CustomerProduct::where('category_id', $product->category_id)->where('id', '!=', $product->id)->where('status', '1')->where('published', '1')->paginate(10);
         return new ClassifiedProductMiniCollection($products);
     }
-
 
     public function productDetails($slug)
     {

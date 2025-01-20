@@ -3,27 +3,31 @@
 namespace App\Http\Controllers\Api\V2;
 
 use App\Models\CombinedOrder;
-use App\Models\User;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Redirect;
 
 class PhonepeController extends Controller
 {
     public function pay(Request $request)
-    {
-        if ($request->payment_type == 'cart_payment') {
+    {   
+        $paymentType = $request->payment_type;
+        $merchantUserId = $request->user_id;
+        $amount = $request->amount;
+        $userId = $request->user_id;
+
+        if ($paymentType == 'cart_payment') {
             $combined_order = CombinedOrder::find($request->combined_order_id);
             $amount = $combined_order->grand_total;
-            $merchantTransactionId = $request->payment_type . '-' . $combined_order->id . '-' . $request->user_id . '-' . rand(0, 100000);
-            $merchantUserId = $request->user_id;
-        } elseif ($request->payment_type == 'wallet_payment') {
-            $amount = $request->amount;
-            $merchantTransactionId = $request->payment_type . '-' . $request->user_id . '-' . $request->user_id . '-' . rand(0, 100000);
-            $merchantUserId = $request->user_id;
-        } elseif ($request->payment_type == 'seller_package_payment' || $request->payment_type == 'customer_package_payment') {
-            $amount = $request->amount;
-            $merchantTransactionId = $request->payment_type . '-' . $request->package_id . '-' . $request->user_id . '-' . rand(0, 100000);
-            $merchantUserId = $request->user_id;
+            $merchantTransactionId = $paymentType . '-' . $combined_order->id . '-' . $userId . '-' . rand(0, 100000);
+        } elseif ($paymentType == 'order_re_payment') {
+            $order = Order::find($request->order_id);
+            $amount = $order->grand_total;
+            $merchantTransactionId = $paymentType . '-' . $order->id . '-' . $userId . '-' . rand(0, 100000);
+        } elseif ($paymentType == 'wallet_payment') {
+            $merchantTransactionId = $paymentType . '-' . $userId . '-' . $userId . '-' . rand(0, 100000);
+        } elseif ($paymentType == 'seller_package_payment' || $paymentType == 'customer_package_payment') {
+            $merchantTransactionId = $paymentType . '-' . $request->package_id . '-' . $userId . '-' . rand(0, 100000);
         }
         // $merchantTransactionId = "MT7850590068188104";
         $merchantId = env('PHONEPE_MERCHANT_ID');
@@ -85,26 +89,23 @@ class PhonepeController extends Controller
         $decodded_response = json_decode(base64_decode($response));
 
         $payment_type = explode("-", $decodded_response->data->merchantTransactionId);
-        // auth()->login(User::findOrFail($payment_type[2]));
-        // dd($payment_type[0], $payment_type[1], $request['merchantId'], $request['transactionId'], $request->all());
+
         $amount = $decodded_response->data->amount / 100;
         if ($decodded_response->code  == 'PAYMENT_SUCCESS') {
             if ($payment_type[0] == 'cart_payment') {
-
                 checkout_done($payment_type[1], json_encode($decodded_response->data));
             }
-
-            if ($payment_type[0] == 'wallet_payment') {
-
+            elseif ($payment_type[0] == 'order_re_payment') {
+                order_re_payment_done($payment_type[1], 'phonepe', json_encode($decodded_response->data));
+            }
+            elseif ($payment_type[0] == 'wallet_payment') {
                 wallet_payment_done($payment_type[2], $amount, 'phonepe', json_encode($decodded_response->data));
             }
-
-            if ($payment_type[0] == 'seller_package_payment') {
-                seller_purchase_payment_done($payment_type[2], $payment_type[1], $amount, 'phonepe', json_encode($decodded_response->data));
+            elseif ($payment_type[0] == 'seller_package_payment') {
+                seller_purchase_payment_done($payment_type[2], $payment_type[1], 'phonepe', json_encode($decodded_response->data));
             }
-
-            if ($payment_type[0] == 'customer_package_payment') {
-                customer_purchase_payment_done($payment_type[2], $payment_type[1]);
+            elseif ($payment_type[0] == 'customer_package_payment') {
+                customer_purchase_payment_done($payment_type[2], $payment_type[1], 'phonepe', json_encode($decodded_response->data));
             }
         }
     }

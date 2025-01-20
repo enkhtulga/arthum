@@ -6,7 +6,6 @@ use DB;
 use Str;
 use Schema;
 use Artisan;
-use Session;
 use ZipArchive;
 use App\Models\Tax;
 use App\Models\Shop;
@@ -95,626 +94,35 @@ class UpdateController extends Controller
 
     public function step2()
     {
-        if (get_setting('current_version') == '8.5') {
-            $sql_path = base_path('sqlupdates/v860.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            return redirect()->route('update.step3');
-        } else if (get_setting('current_version') == '8.4') {
-            $sql_path = base_path('sqlupdates/v850.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v860.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            return redirect()->route('update.step3');
-        } else if (get_setting('current_version') == '8.3') {
-            $sql_path = base_path('sqlupdates/v840.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v850.sql');
-            DB::unprepared(file_get_contents($sql_path));
-            
-            $sql_path = base_path('sqlupdates/v860.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            return redirect()->route('update.step3');
-        } else if (get_setting('current_version') == '8.2') {
-            $sql_path = base_path('sqlupdates/v830.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v840.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v850.sql');
-            DB::unprepared(file_get_contents($sql_path));
-            
-            $sql_path = base_path('sqlupdates/v860.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            return redirect()->route('update.step3');
-        } else if (get_setting('current_version') == '8.1') {
-            $sql_path = base_path('sqlupdates/v820.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v830.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v840.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v850.sql');
-            DB::unprepared(file_get_contents($sql_path));
-            
-            $sql_path = base_path('sqlupdates/v860.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            return redirect()->route('update.step3');
-        }else if (get_setting('current_version') == '8') {
-            $sql_path = base_path('sqlupdates/v810.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v820.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v830.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v840.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v850.sql');
-            DB::unprepared(file_get_contents($sql_path));
-            
-            $sql_path = base_path('sqlupdates/v860.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            return redirect()->route('update.step3');
-        } else if (get_setting('current_version') == '7.9.3') {
-            $sql_path = base_path('sqlupdates/v800.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v810.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v820.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v830.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v840.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v850.sql');
-            DB::unprepared(file_get_contents($sql_path));
-            
-            $sql_path = base_path('sqlupdates/v860.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            return redirect()->route('update.step3');
-        } else if (get_setting('current_version') == '7.9.2') {
-            $sql_path = base_path('sqlupdates/v793.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v800.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v810.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v820.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v830.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v840.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v850.sql');
-            DB::unprepared(file_get_contents($sql_path));
-            
-            $sql_path = base_path('sqlupdates/v860.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            return redirect()->route('update.step3');
-        } else if (get_setting('current_version') == '7.9.1') {
-            $sql_path = base_path('sqlupdates/v792.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v793.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v800.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v810.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v820.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v830.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v840.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v850.sql');
-            DB::unprepared(file_get_contents($sql_path));
-            
-            $sql_path = base_path('sqlupdates/v860.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            return redirect()->route('update.step3');
-        } else if (get_setting('current_version') == '7.9.0') {
-            $sql_path = base_path('sqlupdates/v790.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v791.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v792.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v793.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v800.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v810.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v820.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v830.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v840.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v850.sql');
-            DB::unprepared(file_get_contents($sql_path));
-            
-            $sql_path = base_path('sqlupdates/v860.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            return redirect()->route('update.step3');
-        } else if (get_setting('current_version') == '7.8.0') {
-            $sql_path = base_path('sqlupdates/v790.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v791.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v792.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v793.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v800.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v810.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v820.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v830.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v840.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v850.sql');
-            DB::unprepared(file_get_contents($sql_path));
-            
-            $sql_path = base_path('sqlupdates/v860.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            return redirect()->route('update.step3');
-        } else if (get_setting('current_version') == '7.7.0') {
-            $sql_path = base_path('sqlupdates/v780.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v790.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v791.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v792.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v793.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v800.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v810.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v820.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v830.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v840.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v850.sql');
-            DB::unprepared(file_get_contents($sql_path));
-            
-            $sql_path = base_path('sqlupdates/v860.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            return redirect()->route('update.step3');
-        } elseif (get_setting('current_version') == '7.6.0') {
-            $sql_path = base_path('sqlupdates/v770.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v780.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v790.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v791.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v792.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v793.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v800.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v810.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v820.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v830.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v840.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v850.sql');
-            DB::unprepared(file_get_contents($sql_path));
-            
-            $sql_path = base_path('sqlupdates/v860.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            return redirect()->route('update.step3');
-        } elseif (get_setting('current_version') == '7.5.0') {
-            $sql_path = base_path('sqlupdates/v760.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v770.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v780.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v790.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v791.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v792.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v793.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v800.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v810.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v820.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v830.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v840.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v850.sql');
-            DB::unprepared(file_get_contents($sql_path));
-            
-            $sql_path = base_path('sqlupdates/v860.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            return redirect()->route('update.step3');
-        } elseif (get_setting('current_version') == '7.4.0') {
-            $sql_path = base_path('sqlupdates/v750.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v760.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v770.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v780.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v790.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v791.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v792.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v793.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v800.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v810.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v820.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v830.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v840.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v850.sql');
-            DB::unprepared(file_get_contents($sql_path));
-            
-            $sql_path = base_path('sqlupdates/v860.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            return redirect()->route('update.step3');
-        } elseif (get_setting('current_version') == '7.3.0') {
-            $sql_path = base_path('sqlupdates/v740.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v750.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v760.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v770.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v780.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v790.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v791.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v792.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v793.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v800.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v810.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v820.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v830.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v840.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v850.sql');
-            DB::unprepared(file_get_contents($sql_path));
-            
-            $sql_path = base_path('sqlupdates/v860.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            return redirect()->route('update.step3');
-        } elseif (get_setting('current_version') == '7.2.0') {
-            $sql_path = base_path('sqlupdates/v730.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v740.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v750.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v760.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v770.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v780.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v790.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v791.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v792.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v793.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v800.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v810.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v820.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v830.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v840.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v850.sql');
-            DB::unprepared(file_get_contents($sql_path));
-            
-            $sql_path = base_path('sqlupdates/v860.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            return redirect()->route('update.step3');
-        } elseif (get_setting('current_version') == '7.1.0') {
-            $sql_path = base_path('sqlupdates/v720.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v730.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v740.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v750.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v760.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v770.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v780.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v790.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v791.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v792.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v793.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v800.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v810.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v820.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v830.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v840.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v850.sql');
-            DB::unprepared(file_get_contents($sql_path));
-            
-            $sql_path = base_path('sqlupdates/v860.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            return redirect()->route('update.step3');
-        } elseif (get_setting('current_version') == '7.0.0') {
-            $sql_path = base_path('sqlupdates/v710.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v720.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v730.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v740.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v750.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v760.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v770.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v780.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v790.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v791.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v792.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v793.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v800.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v810.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v820.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v830.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v840.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            $sql_path = base_path('sqlupdates/v850.sql');
-            DB::unprepared(file_get_contents($sql_path));
-            
-            $sql_path = base_path('sqlupdates/v860.sql');
-            DB::unprepared(file_get_contents($sql_path));
-
-            return redirect()->route('update.step3');
-        } else {
+        $versions = ['7.1.0'=>'v710.sql', '7.2.0'=>'v720.sql', '7.3.0'=>'v730.sql', '7.4.0'=>'v740.sql', '7.5.0'=>'v750.sql',
+                    '7.6.0'=>'v760.sql', '7.7.0'=>'v770.sql', '7.8.0'=>'v780.sql', '7.9.0'=>'v790.sql', '7.9.1'=>'v791.sql',
+                    '7.9.2'=>'v792.sql', '7.9.3'=>'v793.sql', '8'=>'v800.sql', '8.1'=>'v810.sql', '8.2'=>'v820.sql',
+                    '8.3'=>'v830.sql', '8.4'=>'v840.sql', '8.5'=>'v850.sql', '8.6'=>'v860.sql', '8.7'=>'v870.sql',
+                    '8.8'=>'v880.sql', '8.9'=>'v890.sql', '9.0'=>'v900.sql', '9.1'=>'v910.sql', '9.2'=>'v920.sql', 
+                    '9.2.1'=>'v921.sql', '9.3'=>'v930.sql', '9.4'=>'v940.sql', '9.5'=>'v950.sql', '9.6'=>'v960.sql', '9.6.1'=>'v961.sql' ];
+
+        $keys = array_keys($versions);
+        $current_version = (get_setting('current_version') != null) ? get_setting('current_version') : '7.1.0';
+
+        if(array_search($current_version, $keys) == false){
             Artisan::call('view:clear');
             Artisan::call('cache:clear');
             $previousRouteServiceProvier = base_path('app/Providers/RouteServiceProvider.php');
             $newRouteServiceProvier      = base_path('app/Providers/RouteServiceProvider.txt');
             copy($newRouteServiceProvier, $previousRouteServiceProvier);
 
-            return view('update.done');
+            flash(translate('Could not update. Please check the compatible version'))->error();
+            return redirect('/');
         }
+
+        $initial_index = (array_search($current_version, $keys)+1);
+
+        for ($i=$initial_index; $i < count($keys); $i++) {
+            $sql_path = base_path('sqlupdates/'.$versions[$keys[$i]]);
+            DB::unprepared(file_get_contents($sql_path));
+        }
+
+        return redirect()->route('update.step3');
     }
 
     public function step3()
@@ -722,6 +130,7 @@ class UpdateController extends Controller
         Artisan::call('view:clear');
         Artisan::call('cache:clear');
 
+        $this->addNotificationType();
         $this->setCategoryToProductCategory();
         // $this->setAdmnRole();
         // $this->convertSellerIntoShop();
@@ -735,6 +144,51 @@ class UpdateController extends Controller
         copy($newRouteServiceProvier, $previousRouteServiceProvier);
 
         return view('update.done');
+    }
+
+    public function addNotificationType(){
+        $notifications = DB::table('notifications')->where('notification_type_id',0)->get();
+        foreach($notifications as $notification){
+            $status = json_decode($notification->data, true)['status'];
+            $notificationTypeId = null;
+            if($notification->type == 'App\Notifications\OrderNotification'){
+                if($status == 'pending'){
+                    $status = 'placed';
+                }
+                $user = User::where('id', $notification->notifiable_id)->first();
+                if($user == null || $status == 'unpaid'){
+                    DB::table('notifications')->where('id', $notification->id)->delete();
+                    continue;
+                }
+                $user_type = $user->user_type;
+                $type = 'order_'.$status.'_'.$user_type;
+                $notificationTypeId = get_notification_type($type, 'type')->id;
+            }
+            elseif($notification->type == 'App\Notifications\ShopProductNotification'){
+                $type = $status == "pending" ? 'seller_product_upload' : "seller_product_approved";
+                $notificationTypeId = get_notification_type($type , 'type')->id;
+            }
+            elseif($notification->type == 'App\Notifications\PayoutNotification'){
+                $type = $status == "pending" ? 'seller_payout_request' : "seller_payout";
+                $notificationTypeId = get_notification_type($type, 'type')->id;
+            }
+            elseif($notification->type == 'App\Notifications\ShopVerificationNotification'){
+                if($status == "submitted"){
+                    $type = 'shop_verify_request_submitted';
+                }
+                elseif($status == "approved"){
+                    $type = 'shop_verify_request_approved';
+                }
+                elseif($status == "rejected"){
+                    $type = 'shop_verify_request_rejected';
+                }
+                $notificationTypeId = get_notification_type($type, 'type')->id;
+            }
+
+            DB::table('notifications')
+                ->where('id', $notification->id)
+                ->update(['notification_type_id' => $notificationTypeId]);
+        }
     }
 
     public function setCategoryToProductCategory()
@@ -880,8 +334,8 @@ class UpdateController extends Controller
             $num_of_sale = 0;
             try {
                 foreach ($seller->user->products as $seller_product) {
-                    $total += $seller_product->reviews->count();
-                    $rating += $seller_product->reviews->sum('rating');
+                    $total += $seller_product->reviews->where('status', 1)->count();
+                    $rating += $seller_product->reviews->where('status', 1)->sum('rating');
                     $num_of_sale += $seller_product->num_of_sale;
                 }
                 if ($total > 0) {

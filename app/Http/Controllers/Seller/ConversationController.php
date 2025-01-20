@@ -61,7 +61,7 @@ class ConversationController extends Controller
             $conversation->receiver_viewed = 1;
             $conversation->save();
         }
-        return view('frontend.'.get_setting('homepage_select').'.partials.messages', compact('conversation'));
+        return view('frontend.partials.messages', compact('conversation'));
     }
 
     /**
@@ -87,5 +87,5 @@ class ConversationController extends Controller
 
         return back();
     }
-    
+
 }

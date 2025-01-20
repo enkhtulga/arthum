@@ -67,8 +67,6 @@ class WalletController extends Controller
         $wallet->offline_payment = 1;
         $wallet->reciept = $request->photo;
         $wallet->save();
-       // flash(translate('Offline Recharge has been done. Please wait for response.'))->success();
-        //return redirect()->route('wallet.index');
         return response()->json([
             'result' => true,
             'message' => translate('Offline Recharge has been done. Please wait for response.')

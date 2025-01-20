@@ -26,8 +26,8 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Auth\Events\PasswordReset;
-use App\Mail\SecondEmailVerifyMailManager;
 use App\Models\Cart;
+use App\Utility\EmailUtility;
 use Artisan;
 use DB;
 use Illuminate\Support\Facades\Redirect;
@@ -53,7 +53,7 @@ class HomeController extends Controller
 
     public function load_todays_deal_section()
     {
-        $todays_deal_products = filter_products(Product::where('todays_deal', '1'))->get();
+        $todays_deal_products = filter_products(Product::where('todays_deal', '1'))->orderBy('id', 'desc')->get();
         return view('frontend.' . get_setting('homepage_select') . '.partials.todays_deal', compact('todays_deal_products'));
     }
 
@@ -275,12 +275,12 @@ class HomeController extends Controller
 
             $product_queries = ProductQuery::where('product_id', $detailedProduct->id)->where('customer_id', '!=', Auth::id())->latest('id')->paginate(3);
             $total_query = ProductQuery::where('product_id', $detailedProduct->id)->count();
-            $reviews = $detailedProduct->reviews()->paginate(3);
+            $reviews = $detailedProduct->reviews()->where('status', 1)->orderBy('created_at', 'desc')->paginate(3);
 
             // Pagination using Ajax
             if (request()->ajax()) {
                 if ($request->type == 'query') {
-                    return Response::json(View::make('frontend.' . get_setting('homepage_select') . '.partials.product_query_pagination', array('product_queries' => $product_queries))->render());
+                    return Response::json(View::make('frontend.partials.product_query_pagination', array('product_queries' => $product_queries))->render());
                 }
                 if ($request->type == 'review') {
                     return Response::json(View::make('frontend.product_details.reviews', array('reviews' => $reviews))->render());
@@ -326,9 +326,9 @@ class HomeController extends Controller
             }
 
             if(get_setting('last_viewed_product_activation') == 1 && Auth::check() && auth()->user()->user_type == 'customer'){
-                lastViewedProducts($detailedProduct->id);
+                lastViewedProducts($detailedProduct->id, auth()->user()->id);
             }
-            
+
             return view('frontend.product_details', compact('detailedProduct', 'product_queries', 'total_query', 'reviews', 'review_status'));
         }
         abort(404);
@@ -594,7 +594,7 @@ class HomeController extends Controller
     public function get_category_items(Request $request)
     {
         $categories = Category::with('childrenCategories')->findOrFail($request->id);
-        return view('frontend.' . get_setting('homepage_select') . '.partials.category_elements', compact('categories'));
+        return view('frontend.partials.category_elements', compact('categories'));
     }
 
     public function premium_package_index()
@@ -635,29 +635,14 @@ class HomeController extends Controller
 
     public function send_email_change_verification_mail($request, $email)
     {
+        $user = auth()->user();
         $response['status'] = 0;
         $response['message'] = 'Unknown';
-
-        $verification_code = Str::random(32);
-
-        $array['subject'] = translate('Email Verification');
-        $array['from'] = env('MAIL_FROM_ADDRESS');
-        $array['content'] = translate('Verify your account');
-        $array['link'] = route('email_change.callback') . '?new_email_verificiation_code=' . $verification_code . '&email=' . $email;
-        $array['sender'] = Auth::user()->name;
-        $array['details'] = translate("Email Second");
-
-        $user = Auth::user();
-        $user->new_email_verificiation_code = $verification_code;
-        $user->save();
-
         try {
-            Mail::to($email)->queue(new SecondEmailVerifyMailManager($array));
-
+            EmailUtility::email_verification($user, $user->user_type);
             $response['status'] = 1;
             $response['message'] = translate("Your verification mail has been Sent to your email.");
         } catch (\Exception $e) {
-            // return $e->getMessage();
             $response['status'] = 0;
             $response['message'] = $e->getMessage();
         }
@@ -772,7 +757,7 @@ class HomeController extends Controller
     {
         $upload_path = $request->file('uploaded_file')->store('uploads', 'local');
         $sql_path = $request->file('sql_file')->store('uploads', 'local');
-        
+
         $zip = new ZipArchive;
         $zip->open(base_path('public/'.$upload_path));
         $zip->extractTo('public/uploads/all');

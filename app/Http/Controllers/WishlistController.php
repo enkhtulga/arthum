@@ -14,30 +14,8 @@ class WishlistController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {   
-        $verified_sellers = verified_sellers_id();
-        $wishlists = Wishlist::where('user_id', Auth::user()->id)
-                    ->whereIn("product_id", function ($query) use ($verified_sellers) {
-                        $query->select('id')
-                            ->from('products')
-                            ->where('approved', '1')->where('published', 1)
-                            ->when(!addon_is_activated('wholesale') ,function ($q1){
-                                $q1->where('wholesale_product', 0);
-                            })
-                            ->when(!addon_is_activated('auction') ,function ($q2){
-                                $q2->where('auction_product', 0);
-                            })
-                            ->when(get_setting('vendor_system_activation') == 0 ,function ($q3){
-                                $q3->where('added_by', 'admin');
-                            })
-                            ->when(get_setting('vendor_system_activation') == 1 ,function ($q4) use ($verified_sellers){
-                                $q4->where(function ($p1) use ($verified_sellers) {
-                                    $p1->where('added_by', 'admin')->orWhere(function ($p2) use ($verified_sellers) {
-                                        $p2->whereIn('user_id', $verified_sellers);
-                                    });
-                                });
-                            });
-                    })->paginate(15);
+    {
+        $wishlists = get_wishlists()->paginate(15);
         return view('frontend.user.view_wishlist', compact('wishlists'));
     }
 
@@ -67,7 +45,7 @@ class WishlistController extends Controller
                 $wishlist->product_id = $request->id;
                 $wishlist->save();
             }
-            return view('frontend.'.get_setting('homepage_select').'.partials.wishlist');
+            return view('frontend.partials.wishlist');
         }
         return 0;
     }
@@ -77,7 +55,7 @@ class WishlistController extends Controller
         $wishlist = Wishlist::findOrFail($request->id);
         if($wishlist!=null){
             if(Wishlist::destroy($request->id)){
-                return view('frontend.'.get_setting('homepage_select').'.partials.wishlist');
+                return view('frontend.partials.wishlist');
             }
         }
     }

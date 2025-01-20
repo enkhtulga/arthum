@@ -4,18 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\PreventDemoModeChanges;
 
-class FrequentlyBroughtProduct extends Model
+class FrequentlyBoughtProduct extends Model
 {
-    use HasFactory;
+    use HasFactory, PreventDemoModeChanges;
+
 
     public function product()
     {
         return $this->belongsTo(Product::class);
     }
     
-    public function frequently_brought_product()
+    public function frequently_bought_product()
     {
-        return $this->belongsTo(Product::class, 'frequently_brought_product_id');
+        return $this->belongsTo(Product::class, 'frequently_bought_product_id');
     }
 }

@@ -1,20 +1,16 @@
 {
     "name": "laravel/laravel",
     "description": "The Laravel Framework.",
-    "keywords": [
-        "framework",
-        "laravel"
-    ],
+    "keywords": ["framework", "laravel"],
     "license": "MIT",
     "type": "project",
     "require": {
-        "php": "^8.0.2",
+        "php": "^8.2",
         "aiz-packages/color-code-converter": "dev-main",
         "aiz-packages/combination-generate": "dev-main",
         "anandsiddharth/laravel-paytm-wallet": "^2.0",
         "authorizenet/authorizenet": "^2.0",
         "enshrined/svg-sanitize": "^0.15.4",
-        "fideloper/proxy": "^4.4",
         "genealabs/laravel-sign-in-with-apple": "*",
         "genealabs/laravel-socialiter": "*",
         "guzzlehttp/guzzle": "^7.5",
@@ -23,8 +19,8 @@
         "iyzico/iyzipay-php": "^2.0",
         "kingflamez/laravelrave": "dev-master",
         "laracasts/flash": "^3.2",
-        "laravel/framework": "^9.2",
-        "laravel/sanctum": "^2.14.1",
+        "laravel/framework": "^10.0",
+        "laravel/sanctum": "^3.2",
         "laravel/socialite": "^5.6",
         "laravel/tinker": "^2.8",
         "laravel/ui": "^4.2",
@@ -34,7 +30,7 @@
         "mehedi-iitdu/core-component-repository": "^2.2",
         "mercadopago/dx-php": "^2.5",
         "mpdf/mpdf": "^8.1",
-        "myfatoorah/laravel-package": "^2.1",
+        "myfatoorah/laravel-package": "^2.2",
         "niklasravnsborg/laravel-pdf": "^4.1",
         "paypal/paypal-checkout-sdk": "dev-master",
         "predis/predis": "^2.1",
@@ -47,8 +43,7 @@
         "spatie/laravel-permission": "^5.5",
         "stripe/stripe-php": "^10.5",
         "twilio/sdk": "^6.44",
-        "unicodeveloper/laravel-paystack": "^1.0",
-        "artum/qpay": "*"
+        "unicodeveloper/laravel-paystack": "^1.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.8",
@@ -56,9 +51,9 @@
         "fakerphp/faker": "^1.9.1",
         "laravel/sail": "^1.0.1",
         "mockery/mockery": "^1.4.4",
-        "nunomaduro/collision": "^6.1",
-        "phpunit/phpunit": "^9.5.10",
-        "spatie/laravel-ignition": "^1.0"
+        "nunomaduro/collision": "^7.0",
+        "phpunit/phpunit": "^10.0",
+        "spatie/laravel-ignition": "^2.0"
     },
     "autoload": {
         "classmap": [
@@ -66,12 +61,9 @@
             "database/factories"
         ],
         "psr-4": {
-            "App\\": "app/",
-            "Artum\\Qpay\\": "packages/arthum/qpay/src/"
+            "App\\": "app/"
         },
-        "files": [
-            "app/Http/Helpers.php"
-        ]
+        "files": ["app/Http/Helpers.php"]
     },
     "autoload-dev": {
         "psr-4": {
@@ -80,7 +72,8 @@
     },
     "extra": {
         "laravel": {
-            "dont-discover": []
+            "dont-discover": [
+            ]
         }
     },
     "scripts": {
@@ -103,12 +96,6 @@
             "symfony/thanks": true
         }
     },
-    "minimum-stability": "dev",
-    "repositories": [
-        {
-            "type": "path",
-            "url": "packages/artum/qpay"
-        }
-    ],
+    "minimum-stability": "stable",
     "prefer-stable": true
 }

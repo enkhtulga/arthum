@@ -62,6 +62,7 @@ class ProductRequest extends FormRequest
             'unit.required'             => translate('Product unit is required'),
             'min_qty.required'          => translate('Minimum purchase quantity is required'),
             'min_qty.numeric'           => translate('Minimum purchase must be numeric'),
+            'unit_price.gt'             => translate('The unit price must be greater than 0'),
             'unit_price.required'       => translate('Unit price is required'),
             'unit_price.numeric'        => translate('Unit price must be numeric'),
             'discount.required'         => translate('Discount is required'),

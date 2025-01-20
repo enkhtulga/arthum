@@ -11,6 +11,7 @@ use App\Models\User;
 use Session;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\PayoutNotification;
+use App\Utility\EmailUtility;
 
 class CommissionController extends Controller
 {
@@ -80,8 +81,18 @@ class CommissionController extends Controller
             $seller_withdraw_request->save();
         }
 
-        $users = User::findMany([$shop->user->id, User::where('user_type', 'admin')->first()->id]);
-        Notification::send($users, new PayoutNotification($shop->user, $payment_data['amount'], 'paid'));
+        // Seller Payout Notification to seller
+        $users = User::findMany($shop->user->id);
+        $data = array();
+        $data['user'] = $shop->user;
+        $data['amount'] = $payment_data['amount'];
+        $data['status'] = 'paid';
+        $data['notification_type_id'] = get_notification_type('seller_payout', 'type')->id;
+        Notification::send($users, new PayoutNotification($data));
+
+        // Seller payout request email to admin & seller
+        $emailIdentifiers = ['seller_payout_email_to_admin','seller_payout_email_to_seller'];
+        EmailUtility::seller_payout($emailIdentifiers, $shop->user, $payment_data['amount'], ucwords(str_replace('_', ' ',$payment_data['payment_method'])));
 
         Session::forget('payment_data');
         Session::forget('payment_type');
@@ -98,21 +109,28 @@ class CommissionController extends Controller
 
     //calculate seller commission after payment
     public function calculateCommission($order){
-        if ($order->payment_type == 'cash_on_delivery') {
-            foreach ($order->orderDetails as $orderDetail) {
-                $orderDetail->payment_status = 'paid';
-                $orderDetail->save();
+        $seller = $order->shop;
+        foreach ($order->orderDetails as $orderDetail) {
+            $orderDetail->payment_status = 'paid';
+            $orderDetail->save();
+
+            if ($seller != null) {
+                $seller = $seller->fresh();
                 $commission_percentage = 0;
-                
+                // getting commission percentage
                 if(get_setting('vendor_commission_activation')){
-                    if (get_setting('category_wise_commission')) {
-                        $commission_percentage = $orderDetail->product->main_category->commision_rate;
-                    } else if ($orderDetail->product->user->user_type == 'seller') {
+                    if(get_setting('seller_commission_type') == 'fixed_rate'){
                         $commission_percentage = get_setting('vendor_commission');
                     }
+                    elseif(get_setting('seller_commission_type') == 'seller_based'){
+                        $commission_percentage = $seller->commission_percentage;
+                    }
+                    elseif(get_setting('seller_commission_type') == 'category_based'){
+                        $commission_percentage = $orderDetail->product->main_category->commision_rate;
+                    }
                 }
-                if ($orderDetail->product->user->user_type == 'seller') {
-                    $seller = $orderDetail->product->user->shop;
+                // calculate commission
+                if($commission_percentage > 0){
                     $admin_commission = ($orderDetail->price * $commission_percentage) / 100;
 
                     if (get_setting('product_manage_by_admin') == 1) {
@@ -120,7 +138,9 @@ class CommissionController extends Controller
                         $seller->admin_to_pay += $seller_earning;
                     } else {
                         $seller_earning = ($orderDetail->tax + $orderDetail->shipping_cost + $orderDetail->price) - $admin_commission;
-                        $seller->admin_to_pay -= $admin_commission;
+                        $seller->admin_to_pay = ($order->payment_type == 'cash_on_delivery') ?
+                                                ($seller->admin_to_pay - $admin_commission) :
+                                                ($seller->admin_to_pay += $seller_earning);
                     }
 
                     $seller->save();
@@ -131,52 +151,15 @@ class CommissionController extends Controller
                     $commission_history->seller_id = $orderDetail->seller_id;
                     $commission_history->admin_commission = $admin_commission;
                     $commission_history->seller_earning = $seller_earning;
-
                     $commission_history->save();
                 }
             }
         }
-        else{
-            foreach ($order->orderDetails as $orderDetail) {
-                $orderDetail->payment_status = 'paid';
-                $orderDetail->save();
-                $commission_percentage = 0;
 
-                if(get_setting('vendor_commission_activation')){
-                    if (get_setting('category_wise_commission')) {
-                        $commission_percentage = $orderDetail->product->main_category->commision_rate;
-                    } else if ($orderDetail->product->user->user_type == 'seller') {
-                        $commission_percentage = get_setting('vendor_commission');
-                    }
-                }
-
-                if ($orderDetail->product->user->user_type == 'seller') {
-                    $seller = $orderDetail->product->user->shop;
-                    $admin_commission = ($orderDetail->price * $commission_percentage)/100;
-
-                    if (get_setting('product_manage_by_admin') == 1) {
-                        $seller_earning = ($orderDetail->tax + $orderDetail->price) - $admin_commission;
-                        $seller->admin_to_pay += $seller_earning;
-                    } else {
-                        $seller_earning = ($orderDetail->tax + $orderDetail->shipping_cost + $orderDetail->price) - $admin_commission;
-                        $seller->admin_to_pay += $seller_earning;
-                    }
-                    $seller->save();
-
-                    $commission_history = new CommissionHistory;
-                    $commission_history->order_id = $order->id;
-                    $commission_history->order_detail_id = $orderDetail->id;
-                    $commission_history->seller_id = $orderDetail->seller_id;
-                    $commission_history->admin_commission = $admin_commission;
-                    $commission_history->seller_earning = $seller_earning;
-
-                    $commission_history->save();
-                }
-            }
-            if($order->shop != null){
-                $seller->admin_to_pay -= $order->coupon_discount;
-                $seller->save();
-            }
+        if($seller != null && $order->payment_type != 'cash_on_delivery'){
+            $seller = $seller->fresh();
+            $seller->admin_to_pay -= $order->coupon_discount;
+            $seller->save();
         }
     }
 }

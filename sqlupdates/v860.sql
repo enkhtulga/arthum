@@ -45,8 +45,7 @@ INSERT INTO `permissions` (`id`, `name`, `section`, `guard_name`, `created_at`, 
           (NULL, 'edit_dynamic_popups', 'marketing', 'web', current_timestamp(), current_timestamp()),
           (NULL, 'delete_dynamic_popups', 'marketing', 'web', current_timestamp(), current_timestamp()),
           (NULL, 'publish_dynamic_popups', 'marketing', 'web', current_timestamp(), current_timestamp()),
-          (NULL, 'brand_bulk_upload', 'brand', 'web', current_timestamp(), current_timestamp()),
-          (NULL, 'export_order', 'sale', 'web', current_timestamp(), current_timestamp());
+          (NULL, 'brand_bulk_upload', 'brand', 'web', current_timestamp(), current_timestamp());
 
 UPDATE `business_settings` SET `value` = '8.6' WHERE `business_settings`.`type` = 'current_version';
 

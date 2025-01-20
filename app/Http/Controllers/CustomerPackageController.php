@@ -170,13 +170,22 @@ class CustomerPackageController extends Controller
         }
     }
 
-    public function purchase_payment_done($payment_data, $payment)
+    public function purchase_payment_done($payment_data, $payment = null)
     {
-        $user = Auth::user();
+        $customer_package_id = $payment_data['customer_package_id'];
+        $user = auth()->user();
         $user->customer_package_id = $payment_data['customer_package_id'];
-        $customer_package = CustomerPackage::findOrFail($payment_data['customer_package_id']);
+        $customer_package = CustomerPackage::findOrFail($customer_package_id);
         $user->remaining_uploads += $customer_package->product_upload;
         $user->save();
+
+        $customer_package_payment = new CustomerPackagePayment;
+        $customer_package_payment->user_id = $user->id;
+        $customer_package_payment->customer_package_id = $customer_package_id;
+        $customer_package_payment->amount = $customer_package->amount;
+        $customer_package_payment->payment_method = $payment_data['payment_method'];
+        $customer_package_payment->payment_details = $payment;
+        $customer_package_payment->save();
 
         flash(translate('Package purchasing successful'))->success();
         return redirect()->route('dashboard');
@@ -184,15 +193,19 @@ class CustomerPackageController extends Controller
 
     public function purchase_package_offline(Request $request)
     {
-        $customer_package = new CustomerPackagePayment;
-        $customer_package->user_id = Auth::user()->id;
-        $customer_package->customer_package_id = $request->package_id;
-        $customer_package->payment_method = $request->payment_option;
-        $customer_package->payment_details = $request->trx_id;
-        $customer_package->approval = 0;
-        $customer_package->offline_payment = 1;
-        $customer_package->reciept = ($request->photo == null) ? '' : $request->photo;
-        $customer_package->save();
+        $customer_package = CustomerPackage::findOrFail($request->package_id);
+
+        $customer_package_payment = new CustomerPackagePayment;
+        $customer_package_payment->user_id = auth()->user()->id;
+        $customer_package_payment->customer_package_id = $request->package_id;
+        $customer_package_payment->amount = $customer_package->amount;
+        $customer_package_payment->payment_method = $request->payment_option;
+        $customer_package_payment->payment_details = $request->trx_id;
+        $customer_package_payment->approval = 0;
+        $customer_package_payment->offline_payment = 1;
+        $customer_package_payment->reciept = ($request->photo == null) ? '' : $request->photo;
+        $customer_package_payment->save();
+
         flash(translate('Offline payment has been done. Please wait for response.'))->success();
         return redirect()->route('customer_products.index');
     }

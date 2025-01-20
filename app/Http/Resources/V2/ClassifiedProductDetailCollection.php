@@ -6,7 +6,6 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 use App\Models\Review;
 use App\Models\Upload;
 use App\Models\Attribute;
-use App\Models\Upload;
 
 class ClassifiedProductDetailCollection extends ResourceCollection
 {

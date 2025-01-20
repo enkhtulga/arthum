@@ -22,7 +22,7 @@ use App\Services\ProductService;
 use App\Services\ProductTaxService;
 use App\Services\ProductFlashDealService;
 use App\Services\ProductStockService;
-use App\Services\FrequentlyBroughtProductService;
+use App\Services\FrequentlyBoughtProductService;
 use Illuminate\Support\Facades\Notification;
 
 class ProductController extends Controller
@@ -32,20 +32,20 @@ class ProductController extends Controller
     protected $productTaxService;
     protected $productFlashDealService;
     protected $productStockService;
-    protected $frequentlyBroughtProductService;
+    protected $frequentlyBoughtProductService;
 
     public function __construct(
         ProductService $productService,
         ProductTaxService $productTaxService,
         ProductFlashDealService $productFlashDealService,
         ProductStockService $productStockService,
-        FrequentlyBroughtProductService $frequentlyBroughtProductService
+        FrequentlyBoughtProductService $frequentlyBoughtProductService
     ) {
         $this->productService = $productService;
         $this->productTaxService = $productTaxService;
         $this->productFlashDealService = $productFlashDealService;
         $this->productStockService = $productStockService;
-        $this->frequentlyBroughtProductService = $frequentlyBroughtProductService;
+        $this->frequentlyBoughtProductService = $frequentlyBoughtProductService;
     }
 
     public function index(Request $request)
@@ -104,9 +104,9 @@ class ProductController extends Controller
             'colors_active', 'colors', 'choice_no', 'unit_price', 'sku', 'current_stock', 'product_id'
         ]), $product);
 
-        // Frequently Brought Products
-        $this->frequentlyBroughtProductService->store($request->only([
-            'product_id', 'frequently_brought_selection_type', 'fq_brought_product_ids', 'fq_brought_product_category_id'
+        // Frequently Bought Products
+        $this->frequentlyBoughtProductService->store($request->only([
+            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id'
         ]));
 
         // Product Translations
@@ -116,8 +116,15 @@ class ProductController extends Controller
         ]));
 
         if (get_setting('product_approve_by_admin') == 1) {
-            $users = User::findMany([auth()->user()->id, User::where('user_type', 'admin')->first()->id]);
-            Notification::send($users, new ShopProductNotification('physical', $product));
+            $users = User::findMany(User::where('user_type', 'admin')->first()->id);
+            
+            $data = array();
+            $data['product_type']   = 'physical';
+            $data['status']         = 'pending';
+            $data['product']        = $product;
+            $data['notification_type_id'] = get_notification_type('seller_product_upload', 'type')->id;
+
+            Notification::send($users, new ShopProductNotification($data));
         }
 
         flash(translate('Product has been inserted successfully'))->success();
@@ -173,10 +180,10 @@ class ProductController extends Controller
             ]));
         }
 
-        // Frequently Brought Products
-        $product->frequently_brought_products()->delete();
-        $this->frequentlyBroughtProductService->store($request->only([
-            'product_id', 'frequently_brought_selection_type', 'fq_brought_product_ids', 'fq_brought_product_category_id'
+        // Frequently Bought Products
+        $product->frequently_bought_products()->delete();
+        $this->frequentlyBoughtProductService->store($request->only([
+            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id'
         ]));
         
         // Product Translations
@@ -345,9 +352,10 @@ class ProductController extends Controller
         $product->categories()->detach();
         $product->stocks()->delete();
         $product->taxes()->delete();
-        $product->frequently_brought_products()->delete();
+        $product->frequently_bought_products()->delete();
         $product->last_viewed_products()->delete();
-
+        $product->flash_deal_products()->delete();
+        deleteProductReview($product);
         if (Product::destroy($id)) {
             Cart::where('product_id', $id)->delete();
             Wishlist::where('product_id', $id)->delete();
@@ -383,7 +391,7 @@ class ProductController extends Controller
 
     public function get_selected_products(Request $request){
         $products = product::whereIn('id', $request->product_ids)->get();
-        return  view('partials.product.frequently_brought_selected_product', compact('products'));
+        return  view('partials.product.frequently_bought_selected_product', compact('products'));
     }
 
     public function categoriesWiseProductDiscount(Request $request){

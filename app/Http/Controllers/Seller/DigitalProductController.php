@@ -13,7 +13,7 @@ use App\Notifications\ShopProductNotification;
 use App\Services\ProductService;
 use App\Services\ProductStockService;
 use App\Services\ProductTaxService;
-use App\Services\FrequentlyBroughtProductService;
+use App\Services\FrequentlyBoughtProductService;
 use Artisan;
 use Auth;
 use Illuminate\Http\Request;
@@ -89,9 +89,9 @@ class DigitalProductController  extends Controller
             ]));
         }
 
-        // Frequently Brought Products
-        (new FrequentlyBroughtProductService)->store($request->only([
-            'product_id', 'frequently_brought_selection_type', 'fq_brought_product_ids', 'fq_brought_product_category_id'
+        // Frequently Bought Products
+        (new FrequentlyBoughtProductService)->store($request->only([
+            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id'
         ]));
 
         // Product Translations
@@ -101,8 +101,14 @@ class DigitalProductController  extends Controller
         ]));
 
         if (get_setting('product_approve_by_admin') == 1) {
-            $users = User::findMany([auth()->user()->id, User::where('user_type', 'admin')->first()->id]);
-            Notification::send($users, new ShopProductNotification('digital', $product));
+            $users = User::findMany(User::where('user_type', 'admin')->first()->id);
+            $data = array();
+            $data['product_type']   = 'digital';
+            $data['status']         = 'pending';
+            $data['product']        = $product;
+            $data['notification_type_id'] = get_notification_type('seller_product_upload', 'type')->id;
+
+            Notification::send($users, new ShopProductNotification($data));
         }
 
         flash(translate('Digital Product has been inserted successfully'))->success();
@@ -162,10 +168,10 @@ class DigitalProductController  extends Controller
             ]));
         }
 
-        // Frequently Brought Products
-        $product->frequently_brought_products()->delete();
-        (new FrequentlyBroughtProductService)->store($request->only([
-            'product_id', 'frequently_brought_selection_type', 'fq_brought_product_ids', 'fq_brought_product_category_id'
+        // Frequently Bought Products
+        $product->frequently_bought_products()->delete();
+        (new FrequentlyBoughtProductService)->store($request->only([
+            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id'
         ]));
 
         // Product Translations

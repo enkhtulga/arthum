@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\BusinessSetting;
+use App\Models\PaymentMethod;
 use Artisan;
 use CoreComponentRepository;
 use Illuminate\Support\Facades\Redirect;
@@ -107,7 +108,8 @@ class BusinessSettingsController extends Controller
     {
         CoreComponentRepository::instantiateShopRepository();
         CoreComponentRepository::initializeCache();
-        return view('backend.setup_configurations.payment_method');
+        $payment_methods = PaymentMethod::whereNull('addon_identifier')->get();
+        return view('backend.setup_configurations.payment_method.index', compact('payment_methods'));
     }
 
     public function file_system(Request $request)
@@ -466,7 +468,17 @@ class BusinessSettingsController extends Controller
         }
 
         Artisan::call('cache:clear');
-        return '1';
+        return 1;
+    }
+
+    public function updatePaymentActivationSettings(Request $request)
+    {
+        $payment_method = PaymentMethod::findOrFail($request->id);
+        $payment_method->active = $request->value;
+        $payment_method->save();
+
+        Artisan::call('cache:clear');
+        return 1;
     }
 
     public function updateActivationSettingsInEnv($request)
@@ -486,33 +498,12 @@ class BusinessSettingsController extends Controller
             $this->overWriteEnvFile($request->type, $request->value);
         }
 
-        return '1';
+        return 1;
     }
 
     public function vendor_commission(Request $request)
     {
         return view('backend.sellers.seller_commission.index');
-    }
-
-    public function vendor_commission_update(Request $request)
-    {
-        foreach ($request->types as $key => $type) {
-            $business_settings = BusinessSetting::where('type', $type)->first();
-            if ($business_settings != null) {
-                $business_settings->value = $request[$type];
-                $business_settings->save();
-            } else {
-                $business_settings = new BusinessSetting;
-                $business_settings->type = $type;
-                $business_settings->value = $request[$type];
-                $business_settings->save();
-            }
-        }
-
-        Artisan::call('cache:clear');
-
-        flash(translate('Seller Commission updated successfully'))->success();
-        return back();
     }
 
     public function shipping_configuration(Request $request)
@@ -542,7 +533,7 @@ class BusinessSettingsController extends Controller
             flash(translate('Demo data import will not work in demo site'))->error();
             return back();
         }
-        $url = 'https://activeitzone.com/ecommerce-demo-data-import/import';
+        $url = 'https://demo.activeitzone.com/envato/ecommerce-demo-data-import/import';
         $header = array(
             'Content-Type:application/json'
         );
@@ -551,7 +542,7 @@ class BusinessSettingsController extends Controller
         $data['purchase_key'] = $request->purchase_key;
         $data['layout'] = $request->layout;
         $request_data_json = json_encode($data);
-        
+
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
@@ -561,13 +552,13 @@ class BusinessSettingsController extends Controller
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
         curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
         $raw_file_data = curl_exec($ch);
-        
+
         if(json_decode($raw_file_data, true)['status']) {
             flash(translate('Demo data uploaded successfully'))->success();
         } else {
             flash(translate(json_decode($raw_file_data, true)['message']))->error();
         }
-        
+
         return back();
     }
 }

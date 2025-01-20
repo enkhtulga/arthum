@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Product;
 use App\Models\ProductStock;
 use App\Models\User;
+use App\Traits\PreventDemoModeChanges;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
@@ -18,6 +19,8 @@ use Storage;
 //class ProductsImport implements ToModel, WithHeadingRow, WithValidation
 class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, ToModel
 {
+    use PreventDemoModeChanges;
+
     private $rows = 0;
 
     public function collection(Collection $rows)
